@@ -16,60 +16,73 @@
     <div id="game-container" class="hidden">
         <!-- Главное меню -->
         <div id="main-menu" class="screen">
-            <div class="menu-container">
-                <div class="game-logo">
-                    <div class="logo-image">
-                        <div class="prostobas-coin">
-                            <div class="coin-inner">
-                                <div class="coin-front">
-                                    <span class="coin-symbol">CR</span>
+            <div class="swipe-hint">
+                <span class="swipe-text">CryptoRush</span>
+            </div>
+            <div class="about-slider">
+                <div class="about-cards">
+                    <!-- Карточка игры -->
+                    <div class="about-card menu-card">
+                        <div class="feature-block gradient-play">
+                            <div class="block-icon">▶️</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>CryptoRush</h2>
+                            <p>Увлекательное приключение в мире криптовалют!</p>
+                            <div class="menu-buttons">
+                                <button id="start-button" class="menu-button play-button">Играть</button>
+                                <div class="difficulty-select hidden">
+                                    <button id="easy-mode" class="menu-button">Легкий</button>
+                                    <button id="medium-mode" class="menu-button">Средний</button>
+                                    <button id="hard-mode" class="menu-button">Сложный</button>
+                                    <button id="back-to-menu" class="menu-button">Назад</button>
                                 </div>
-                                <div class="coin-glow"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="logo-text">
-                        <span class="crypto">Crypto</span>
-                        <span class="rush">Rush</span>
+
+                    <!-- Карточка рекордов -->
+                    <div class="about-card menu-card">
+                        <div class="feature-block gradient-leaderboard">
+                            <div class="block-icon">🏆</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Таблица рекордов</h2>
+                            <p>Соревнуйтесь с другими игроками за лучший результат!</p>
+                            <div class="menu-buttons">
+                                <button id="leaderboard-button" class="menu-button">Смотреть рекорды</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка настроек -->
+                    <div class="about-card menu-card">
+                        <div class="feature-block gradient-settings">
+                            <div class="block-icon">⚙️</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Настройки</h2>
+                            <p>Настройте игру под себя!</p>
+                            <div class="menu-buttons">
+                                <button id="settings-button" class="menu-button">Настройки</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка об игре -->
+                    <div class="about-card menu-card">
+                        <div class="feature-block gradient-about">
+                            <div class="block-icon">ℹ️</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Об игре</h2>
+                            <p>Узнайте больше о нашей игре!</p>
+                            <div class="menu-buttons">
+                                <button id="about-button" class="menu-button">Подробнее</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="menu-buttons">
-                    <button id="start-button" class="menu-button">
-                        <i class="button-icon play-icon"></i>
-                        <span>Играть</span>
-                    </button>
-                    <div class="difficulty-select hidden">
-                        <button id="easy-mode" class="menu-button">
-                            <i class="button-icon easy-icon"></i>
-                            <span>Легкий</span>
-                        </button>
-                        <button id="medium-mode" class="menu-button">
-                            <i class="button-icon medium-icon"></i>
-                            <span>Средний</span>
-                        </button>
-                        <button id="hard-mode" class="menu-button">
-                            <i class="button-icon hard-icon"></i>
-                            <span>Сложный</span>
-                        </button>
-                        <button id="back-to-menu" class="menu-button">
-                            <i class="button-icon back-icon"></i>
-                            <span>Назад</span>
-                        </button>
-                    </div>
-                    <button id="leaderboard-button" class="menu-button">
-                        <i class="button-icon trophy-icon"></i>
-                        <span>Таблица рекордов</span>
-                    </button>
-                    <button id="settings-button" class="menu-button">
-                        <i class="button-icon settings-icon"></i>
-                        <span>Настройки</span>
-                    </button>
-                    <button id="about-button" class="menu-button">
-                        <i class="button-icon info-icon"></i>
-                        <span>Об игре</span>
-                    </button>
-                </div>
-                <div class="version-info">Версия 1.0.0</div>
             </div>
         </div>
 
@@ -98,119 +111,211 @@
 
         <!-- Экран настроек -->
         <div id="settings-screen" class="screen hidden">
-            <div class="settings-header">
-                <h2 data-translate="settings">Настройки</h2>
+            <div class="swipe-hint">
+                <span class="swipe-text">Настройки игры</span>
             </div>
-            <div class="settings-cards">
-                <div class="settings-card">
-                    <div class="card-icon">
-                        <i class="sound-icon"></i>
-                    </div>
-                    <div class="card-content">
-                        <span class="card-label" data-translate="sound">Звук</span>
-                        <div class="card-value">
-                            <input type="checkbox" id="sound" class="toggle-switch">
-                            <label for="sound" class="toggle-label"></label>
-                        </div>
-                    </div>
-                </div>
+            <div class="about-slider">
+                <div class="about-cards">
+                    <div class="about-card settings-card">
+                        <div class="feature-content">
+                            <div class="settings-list">
+                                <div class="settings-item">
+                                    <span>Звук</span>
+                                    <input type="checkbox" id="sound" class="toggle-switch">
+                                    <label for="sound" class="toggle-label"></label>
+                                </div>
+                                
+                                <div class="settings-item">
+                                    <span>Музыка</span>
+                                    <input type="checkbox" id="music" class="toggle-switch">
+                                    <label for="music" class="toggle-label"></label>
+                                </div>
+                                
+                                <div class="settings-item">
+                                    <span>Язык</span>
+                                    <select id="language" class="settings-select">
+                                        <option value="ru">Русский</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                </div>
 
-                <div class="settings-card">
-                    <div class="card-icon">
-                        <i class="music-icon"></i>
-                    </div>
-                    <div class="card-content">
-                        <span class="card-label" data-translate="music">Музыка</span>
-                        <div class="card-value">
-                            <input type="checkbox" id="music" class="toggle-switch">
-                            <label for="music" class="toggle-label"></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="settings-card">
-                    <div class="card-icon">
-                        <i class="language-icon"></i>
-                    </div>
-                    <div class="card-content">
-                        <span class="card-label" data-translate="language">Язык</span>
-                        <div class="card-value">
-                            <select id="language" class="settings-select">
-                                <option value="ru">Русский</option>
-                                <option value="en">English</option>
-                            </select>
+                                <div class="settings-item">
+                                    <span>Показывать FPS</span>
+                                    <input type="checkbox" id="show-fps" class="toggle-switch">
+                                    <label for="show-fps" class="toggle-label"></label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <button id="settings-back" class="back-button transparent" data-translate="back">Назад</button>
+            <div class="back-hint">
+                <span class="back-arrow">←</span>
+                <span class="back-text">Вернуться в меню</span>
+            </div>
         </div>
 
         <!-- Экран "Об игре" -->
         <div id="about-screen" class="screen hidden">
+            <div class="swipe-hint">
+                <span class="swipe-text">Листайте вправо</span>
+                <span class="swipe-arrow">→</span>
+            </div>
+            <div class="back-hint">
+                <span class="back-arrow">←</span>
+                <span class="back-text">Вернуться в меню</span>
+            </div>
             <div class="about-slider">
                 <div class="about-cards">
-                    <!-- Карточка 1 -->
+                    <!-- Карточка 1 - Multi-Line Edits -->
                     <div class="about-card">
-                        <div class="card-icon">
-                            <div class="icon-wrapper gradient-pink">
-                                <div class="hands-icon">
-                                    <span class="hand top"></span>
-                                    <span class="sparkles"></span>
-                                    <span class="hand bottom"></span>
-                                </div>
-                            </div>
+                        <div class="feature-image">
+                            <img src="images/use-images.jpg" alt="Use Images">
                         </div>
-                        <h3 data-translate="about_card1_title">Игровой процесс</h3>
-                        <p data-translate="about_card1_text">Увлекательный раннер с элементами криптовалютного мира</p>
+                        <div class="feature-content">
+                            <h2>Use Images</h2>
+                            <p>Hit the image button under chat or drag an image into the input box to include visual context into chat.</p>
+                        </div>
                     </div>
 
-                    <!-- Карточка 2 -->
+                    <!-- Карточка 2 - Smart Rewrites -->
                     <div class="about-card">
-                        <div class="card-icon">
-                            <div class="icon-wrapper gradient-purple">
-                                <div class="fingerprint-icon"></div>
-                            </div>
+                        <div class="feature-image">
+                            <img src="images/ask-web.jpg" alt="Ask the Web">
                         </div>
-                        <h3 data-translate="about_card2_title">Особенности</h3>
-                        <p data-translate="about_card2_text">Различные типы монет и уникальные препятствия</p>
+                        <div class="feature-content">
+                            <h2>Ask the Web</h2>
+                            <p>Get up-to-date information from the internet with @Web. Cursor will search the web for you and use the latest information to answer your question.</p>
+                        </div>
                     </div>
 
-                    <!-- Карточка 3 -->
+                    <!-- Карточка 3 - Cursor Prediction -->
                     <div class="about-card">
-                        <div class="card-icon">
-                            <div class="icon-wrapper gradient-blue">
-                                <div class="waves-icon">
-                                    <span class="wave"></span>
-                                    <span class="wave"></span>
-                                    <span class="wave"></span>
-                                </div>
-                            </div>
+                        <div class="feature-image">
+                            <img src="images/use-docs.jpg" alt="Use Documentation">
                         </div>
-                        <h3 data-translate="about_card3_title">Награды</h3>
-                        <p data-translate="about_card3_text">Соревнуйтесь и попадайте в таблицу лидеров</p>
+                        <div class="feature-content">
+                            <h2>Use Documentation</h2>
+                            <p>Reference popular libraries using @LibraryName, or add your own using @Docs → Add new doc.</p>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Индикаторы слайдов -->
-                <div class="slider-dots">
-                    <span class="dot active"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
                 </div>
             </div>
-            <button id="about-back" class="back-button transparent" data-translate="back">Назад</button>
         </div>
 
-        <!-- Добавляем экран таблицы рекордов -->
+        <!-- Экран таблицы рекордов -->
         <div id="leaderboard-screen" class="screen hidden">
-            <div class="section-wrapper">
-                <h2 class="section-title">Лучшие результаты</h2>
-                <div class="section-container">
-                    <div id="leaderboard-list"></div>
+            <div class="swipe-hint">
+                <span class="swipe-text">Таблица рекордов</span>
+            </div>
+            <div class="about-slider">
+                <div class="about-cards">
+                    <!-- Карточка топ-1 -->
+                    <div class="about-card">
+                        <div class="feature-block gradient-gold">
+                            <div class="block-icon">👑</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Лучший игрок</h2>
+                            <div class="leaderboard-info">
+                                <p id="top1-name">-</p>
+                                <p id="top1-score">0 монет</p>
+                                <p id="top1-difficulty">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка топ-2 -->
+                    <div class="about-card">
+                        <div class="feature-block gradient-silver">
+                            <div class="block-icon">🥈</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Второе место</h2>
+                            <div class="leaderboard-info">
+                                <p id="top2-name">-</p>
+                                <p id="top2-score">0 монет</p>
+                                <p id="top2-difficulty">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка топ-3 -->
+                    <div class="about-card">
+                        <div class="feature-block gradient-bronze">
+                            <div class="block-icon">🥉</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Третье место</h2>
+                            <div class="leaderboard-info">
+                                <p id="top3-name">-</p>
+                                <p id="top3-score">0 монет</p>
+                                <p id="top3-difficulty">-</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button id="leaderboard-back" class="back-button">Назад</button>
+            <div class="back-hint">
+                <span class="back-arrow">←</span>
+                <span class="back-text">Вернуться в меню</span>
+            </div>
+        </div>
+
+        <!-- Экран выбора сложности -->
+        <div id="difficulty-screen" class="screen hidden">
+            <div class="swipe-hint">
+                <span class="swipe-text">Выберите сложность</span>
+            </div>
+            <div class="about-slider">
+                <div class="about-cards">
+                    <!-- Карточка легкого уровня -->
+                    <div class="about-card menu-card">
+                        <div class="feature-block gradient-easy">
+                            <div class="block-icon">🌟</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Легкий</h2>
+                            <p>Идеально для новичков! Меньше препятствий, больше монет.</p>
+                            <div class="menu-buttons">
+                                <button id="easy-mode-start" class="menu-button">Начать игру</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка среднего уровня -->
+                    <div class="about-card menu-card">
+                        <div class="feature-block gradient-medium">
+                            <div class="block-icon">⚡</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Средний</h2>
+                            <p>Сбалансированный уровень сложности для опытных игроков.</p>
+                            <div class="menu-buttons">
+                                <button id="medium-mode-start" class="menu-button">Начать игру</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Карточка сложного уровня -->
+                    <div class="about-card menu-card">
+                        <div class="feature-block gradient-hard">
+                            <div class="block-icon">🔥</div>
+                        </div>
+                        <div class="feature-content">
+                            <h2>Сложный</h2>
+                            <p>Настоящий вызов! Максимальная скорость и препятствия.</p>
+                            <div class="menu-buttons">
+                                <button id="hard-mode-start" class="menu-button">Начать игру</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="back-hint">
+                <span class="back-arrow">←</span>
+                <span class="back-text">Вернуться в меню</span>
+            </div>
         </div>
     </div>
     <script>
@@ -233,5 +338,6 @@
     <script src="data.js"></script>
     <script src="settings.js"></script>
     <script src="game.js"></script>
+    <script src="sounds.js"></script>
 </body>
 </html> 

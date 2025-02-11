@@ -61,15 +61,15 @@ class Game {
         this.isPaused = false;
         this.lives = 3;
         
-        // Инициализируем настройки по умолчанию
+        // Загружаем сохраненные настройки или используем настройки по умолчанию
         this.settings = {
             soundEnabled: true,
             musicEnabled: true,
-            language: 'ru'
+            language: localStorage.getItem('gameLanguage') || 'ru',
+            showFps: false,
+            ...JSON.parse(localStorage.getItem('gameSettings') || '{}')
         };
         
-        // Загружаем сохраненные настройки
-        this.loadSettings();
         this.init();
 
         // Добавляем новые игровые механики
@@ -86,6 +86,7 @@ class Game {
         
         // Добавляем FPS счетчик
         this.lastTime = 0;
+        this.fps = 0;
         this.fpsCounter = document.createElement('div');
         this.fpsCounter.id = 'fps-counter';
         document.getElementById('game-screen').appendChild(this.fpsCounter);
@@ -122,6 +123,9 @@ class Game {
         };
 
         this.projectiles = [];
+
+        // Инициализируем звуки
+        this.soundManager = new SoundManager();
     }
 
     init() {
@@ -142,6 +146,7 @@ class Game {
             if (this.isPlaying && !this.isPaused) {
                 // Просто прыгаем при каждом касании
                 this.player.velocity = this.player.jumpForce;
+                this.soundManager.playSound('jump');
             }
         };
 
@@ -151,43 +156,28 @@ class Game {
     }
 
     start() {
-        console.log('Game started with difficulty:', this.difficulty);
         this.isPlaying = true;
-        this.coins = 0;
-        this.lives = 3;
-        this.obstacles = [];
-        this.cryptoCoins = [];
-        this.powerUps = [];
-        this.combo = 0;
-        this.doubleJumpAvailable = false;
-        this.player.y = this.canvas.height / 2;
-        this.player.velocity = 0;
-        this.updateLives();
-        this.gameLoop();
-    }
+        this.isPaused = false;
+        this.reset();
+        
+        // Запускаем игровой цикл
+        const gameLoop = () => {
+            if (this.isPlaying) {
+                this.update();
+                this.draw();
+                requestAnimationFrame(gameLoop);
+            }
+        };
+        gameLoop();
 
-    gameLoop() {
-        if (!this.isPlaying || this.isPaused) return;
-
-        this.update();
-        this.draw();
-        requestAnimationFrame(() => this.gameLoop());
+        this.soundManager.startMusic();
     }
 
     update() {
         if (this.isPaused) return;
 
         // Обновление FPS
-        if (this.settings.showFps) {
-            this.fpsCounter.style.display = 'block';
-            const now = performance.now();
-            const delta = now - this.lastTime;
-            this.lastTime = now;
-            const fps = Math.round(1000 / delta);
-            this.fpsCounter.textContent = `FPS: ${fps}`;
-        } else {
-            this.fpsCounter.style.display = 'none';
-        }
+        this.updateFPS(performance.now());
 
         // Обновление позиции игрока
         this.player.velocity += this.player.gravity;
@@ -393,6 +383,8 @@ class Game {
             if (this.settings.vibration && 'vibrate' in navigator) {
                 navigator.vibrate(200);
             }
+
+            this.soundManager.playSound('hit');
         }
         return false;
     }
@@ -403,43 +395,74 @@ class Game {
         return Math.sqrt(dx*dx + dy*dy) < (player.width/2 + coin.size/2);
     }
 
-    gameOver(reason = 'Столкновение') {
+    gameOver(reason) {
         this.isPlaying = false;
-        const score = this.coins;
+        this.isPaused = false;
         
-        // Запрашиваем имя игрока
-        let playerName = prompt(
-            currentLanguage === 'ru' ? 'Введите ваше имя:' : 'Enter your name:', 
-            'Player'
-        );
+        // Проигрываем звук окончания игры
+        this.soundManager.playSound('gameOver');
+        this.soundManager.stopMusic();
         
-        if (playerName === null || playerName.trim() === '') {
-            playerName = 'Player';
-        }
+        // Сохраняем результат, если нужно
+        this.saveScore();
         
-        // Сохраняем результат
-        gameData.addScore(score, this.difficulty, playerName);
-        
-        // Показываем сообщение
-        alert(
-            `${translations[currentLanguage].gameOver}!\n` +
-            `${translations[currentLanguage].score}: ${score}`
-        );
-        
-        // Обновляем таблицу рекордов
-        this.updateLeaderboard();
-        
-        // Возвращаемся в главное меню
-        showScreen('main-menu');
+        // Небольшая задержка перед возвратом в меню
+        setTimeout(() => {
+            showScreen('main-menu');
+        }, 1000);
     }
 
-    saveScore(score) {
-        gameData.addScore(score, this.difficulty);
+    saveScore() {
+        const playerName = prompt(
+            translations[currentLanguage].enterName || 'Введите ваше имя:', 
+            'Player'
+        ) || 'Player';
+
+        const score = {
+            name: playerName,
+            coins: this.coins,
+            difficulty: this.difficulty,
+            date: new Date().toISOString()
+        };
+        
+        // Получаем существующие рекорды
+        let scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+        scores.push(score);
+        
+        // Сортируем по убыванию монет
+        scores.sort((a, b) => b.coins - a.coins);
+        
+        // Оставляем только топ-3
+        scores = scores.slice(0, 3);
+        
+        // Сохраняем обновленную таблицу рекордов
+        localStorage.setItem('leaderboard', JSON.stringify(scores));
+        
+        // Обновляем отображение
+        this.updateLeaderboard();
     }
 
     updateLeaderboard() {
-        const leaderboardList = document.getElementById('leaderboard-list');
-        leaderboardList.innerHTML = gameData.getFormattedLeaderboard();
+        const scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
+        const difficultyTranslations = {
+            easy: translations[currentLanguage].easy,
+            medium: translations[currentLanguage].medium,
+            hard: translations[currentLanguage].hard
+        };
+
+        // Обновляем каждую позицию
+        for (let i = 1; i <= 3; i++) {
+            const score = scores[i - 1] || { name: '-', coins: 0, difficulty: '-' };
+            const nameEl = document.getElementById(`top${i}-name`);
+            const scoreEl = document.getElementById(`top${i}-score`);
+            const difficultyEl = document.getElementById(`top${i}-difficulty`);
+
+            if (nameEl) nameEl.textContent = score.name;
+            if (scoreEl) scoreEl.textContent = `${score.coins} ${translations[currentLanguage].coins}`;
+            if (difficultyEl) {
+                difficultyEl.textContent = difficultyTranslations[score.difficulty] || score.difficulty;
+            }
+        }
     }
 
     loadSprite(src) {
@@ -448,12 +471,25 @@ class Game {
         return img;
     }
 
-    setDifficulty(level) {
-        this.difficulty = level;
-        const settings = this.difficultySettings[level];
-        this.gameSpeed = settings.speed;
-        this.obstacleFrequency = settings.obstacleFrequency;
-        this.coinFrequency = settings.coinFrequency;
+    setDifficulty(difficulty) {
+        this.difficulty = difficulty;
+        this.reset(); // Сбрасываем состояние игры
+    }
+
+    reset() {
+        this.coins = 0;
+        this.lives = 3;
+        this.obstacles = [];
+        this.cryptoCoins = [];
+        this.powerUps = [];
+        this.player.y = 0;
+        this.player.velocity = 0;
+        this.isPaused = false;
+        
+        // Обновляем отображение монет
+        if (this.scoreElement) {
+            this.scoreElement.textContent = '0';
+        }
     }
 
     generateCoin() {
@@ -526,10 +562,16 @@ class Game {
         if (languageSelect) {
             languageSelect.value = this.settings.language;
         }
+
+        const showFpsCheckbox = document.getElementById('show-fps');
+        if (showFpsCheckbox) {
+            showFpsCheckbox.checked = this.settings.showFps;
+        }
     }
 
     saveSettings() {
         localStorage.setItem('gameSettings', JSON.stringify(this.settings));
+        localStorage.setItem('gameLanguage', this.settings.language); // Сохраняем язык отдельно
     }
 
     generatePowerUp() {
@@ -631,6 +673,8 @@ class Game {
         if (this.settings.vibration && 'vibrate' in navigator) {
             navigator.vibrate(50);
         }
+
+        this.soundManager.playSound('coin');
     }
 
     generateEnemy() {
@@ -652,7 +696,29 @@ class Game {
         enemy.initialY = enemy.y;
         return enemy;
     }
+
+    // Добавим метод для обновления FPS
+    updateFPS(timestamp) {
+        if (!this.lastTime) {
+            this.lastTime = timestamp;
+            return;
+        }
+
+        const delta = timestamp - this.lastTime;
+        this.fps = Math.round(1000 / delta);
+        this.lastTime = timestamp;
+
+        if (this.settings.showFps) {
+            this.fpsCounter.textContent = `FPS: ${this.fps}`;
+            this.fpsCounter.style.display = 'block';
+        } else {
+            this.fpsCounter.style.display = 'none';
+        }
+    }
 }
+
+// Объявляем переменную game глобально
+let game;
 
 // Определяем функцию showScreen в глобальной области видимости
 function showScreen(screenId) {
@@ -661,41 +727,49 @@ function showScreen(screenId) {
         screen.classList.add('hidden');
     });
     document.getElementById(screenId).classList.remove('hidden');
+
+    // Инициализируем слайдер на экранах, где он есть
+    if (screenId === 'about-screen' || 
+        screenId === 'settings-screen' || 
+        screenId === 'leaderboard-screen') {
+        initAboutSlider();
+    }
 }
 
 // Инициализация игры
-let game;
 document.addEventListener('DOMContentLoaded', () => {
+    // Инициализируем игру
     game = new Game();
 
-    // Обработчик кнопки "Играть"
+    // Заменяем обработчик кнопки "Играть"
     document.getElementById('start-button').addEventListener('click', () => {
-        console.log('Start button clicked');
-        document.querySelector('.difficulty-select').classList.remove('hidden');
-        document.getElementById('start-button').classList.add('hidden');
-        document.getElementById('leaderboard-button').classList.add('hidden');
-        document.getElementById('settings-button').classList.add('hidden');
-        document.getElementById('about-button').classList.add('hidden');
+        showScreen('difficulty-screen');
     });
 
-    // Обработчик кнопки "Назад" в выборе сложности
-    document.getElementById('back-to-menu').addEventListener('click', () => {
-        console.log('Back to menu clicked'); // Для отладки
-        document.querySelector('.difficulty-select').classList.add('hidden');
-        document.getElementById('start-button').classList.remove('hidden');
-        document.getElementById('leaderboard-button').classList.remove('hidden');
-        document.getElementById('settings-button').classList.remove('hidden');
-        document.getElementById('about-button').classList.remove('hidden');
+    // Обработчик для кнопки "Назад" на экране сложности
+    document.querySelector('#difficulty-screen .back-hint').addEventListener('click', () => {
+        showScreen('main-menu');
     });
 
     // Обработчики кнопок сложности
-    ['easy', 'medium', 'hard'].forEach(difficulty => {
-        document.getElementById(`${difficulty}-mode`).addEventListener('click', () => {
-            console.log(`${difficulty} mode selected`); // Для отладки
-            game.setDifficulty(difficulty);
-            showScreen('game-screen');
-            game.start();
-        });
+    const difficultyModes = {
+        'easy-mode-start': 'easy',
+        'medium-mode-start': 'medium',
+        'hard-mode-start': 'hard'
+    };
+
+    Object.entries(difficultyModes).forEach(([buttonId, difficulty]) => {
+        const button = document.getElementById(buttonId);
+        if (button) {
+            button.addEventListener('click', () => {
+                if (game) {
+                    game.setDifficulty(difficulty);
+                    game.isPlaying = true;
+                    game.start();
+                    showScreen('game-screen');
+                }
+            });
+        }
     });
 
     // Обработчики остальных кнопок меню
@@ -710,15 +784,27 @@ document.addEventListener('DOMContentLoaded', () => {
         showScreen('settings-screen');
     });
 
+    // Обработчик кнопки "Об игре"
     document.getElementById('about-button').addEventListener('click', () => {
-        console.log('About button clicked'); // Для отладки
+        console.log('About button clicked');
         showScreen('about-screen');
     });
 
-    // Обработчики кнопок "Назад"
-    ['settings-back', 'about-back', 'leaderboard-back'].forEach(id => {
-        document.getElementById(id).addEventListener('click', () => {
-            console.log(`${id} clicked`); // Для отладки
+    // Обработчики только для существующих кнопок
+    const backButtons = ['settings-back', 'leaderboard-back'];
+    backButtons.forEach(id => {
+        const button = document.getElementById(id);
+        if (button) {
+            button.addEventListener('click', () => {
+                console.log(`${id} clicked`);
+                showScreen('main-menu');
+            });
+        }
+    });
+
+    // Обработчики для возврата в меню
+    document.querySelectorAll('.back-hint').forEach(backHint => {
+        backHint.addEventListener('click', () => {
             showScreen('main-menu');
         });
     });
@@ -752,8 +838,14 @@ document.addEventListener('DOMContentLoaded', () => {
         game.saveSettings();
     });
 
-    document.getElementById('language').addEventListener('change', (e) => {
-        updateLanguage(e.target.value);
+    // Обработчик изменения языка
+    document.getElementById('language').addEventListener('change', function(e) {
+        const selectedLang = e.target.value;
+        if (game) {
+            game.settings.language = selectedLang;
+            game.saveSettings();
+            updateLanguage(selectedLang);
+        }
     });
 
     // Обработчик кнопки "Назад" в настройках
@@ -765,56 +857,251 @@ document.addEventListener('DOMContentLoaded', () => {
             showScreen('main-menu');
         }
     });
+
+    // Устанавливаем сохраненный язык в селекте
+    const savedLang = game.settings.language;
+    const languageSelect = document.getElementById('language');
+    if (languageSelect) {
+        languageSelect.value = savedLang;
+        updateLanguage(savedLang);
+    }
+
+    document.getElementById('show-fps').addEventListener('change', (e) => {
+        game.settings.showFps = e.target.checked;
+        game.saveSettings();
+    });
 });
 
-// Инициализация слайдера
+// Функция инициализации слайдера
 function initAboutSlider() {
-    const cards = document.querySelector('.about-cards');
+    const slider = document.querySelector('.about-cards');
     const dots = document.querySelectorAll('.dot');
     let currentSlide = 0;
     let startX = 0;
     let currentX = 0;
+    let isDragging = false;
 
-    // Обработка свайпов
-    cards.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        cards.style.transition = 'none';
-    });
-
-    cards.addEventListener('touchmove', (e) => {
-        currentX = e.touches[0].clientX;
-        const diff = currentX - startX;
-        const offset = -currentSlide * 100 + (diff / cards.offsetWidth) * 100;
-        cards.style.transform = `translateX(${offset}%)`;
-    });
-
-    cards.addEventListener('touchend', (e) => {
-        cards.style.transition = 'transform 0.3s ease';
-        const diff = currentX - startX;
+    function goToSlide(n) {
+        currentSlide = Math.max(0, Math.min(n, 3)); // Ограничиваем диапазон
+        const offset = -currentSlide * 25;
+        slider.style.transition = 'transform 0.3s ease';
+        slider.style.transform = `translateX(${offset}%)`;
         
-        if (Math.abs(diff) > 50) { // Минимальное расстояние для свайпа
-            if (diff > 0 && currentSlide > 0) {
-                currentSlide--;
-            } else if (diff < 0 && currentSlide < 2) {
-                currentSlide++;
-            }
-        }
-        
-        updateSlider();
-    });
-
-    // Обработка нажатий на точки
-    dots.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            currentSlide = index;
-            updateSlider();
-        });
-    });
-
-    function updateSlider() {
-        cards.style.transform = `translateX(-${currentSlide * 100/3}%)`;
+        // Обновляем точки
         dots.forEach((dot, index) => {
             dot.classList.toggle('active', index === currentSlide);
         });
     }
+
+    // Обработчики для точек
+    dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => goToSlide(index));
+    });
+
+    // Обработчики для свайпов
+    slider.addEventListener('mousedown', (e) => {
+        startX = e.pageX;
+        currentX = startX;
+        isDragging = true;
+        slider.style.transition = 'none';
+        e.preventDefault();
+    });
+
+    slider.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].pageX;
+        currentX = startX;
+        isDragging = true;
+        slider.style.transition = 'none';
+    });
+
+    function handleMove(clientX) {
+        if (!isDragging) return;
+        
+        currentX = clientX;
+        const diff = currentX - startX;
+        const move = -(currentSlide * 25) + (diff / slider.offsetWidth * 100);
+        slider.style.transform = `translateX(${move}%)`;
+    }
+
+    slider.addEventListener('mousemove', (e) => handleMove(e.pageX));
+    slider.addEventListener('touchmove', (e) => handleMove(e.touches[0].pageX));
+
+    function handleEnd() {
+        if (!isDragging) return;
+        
+        isDragging = false;
+        const diff = currentX - startX;
+        
+        if (Math.abs(diff) > 50) {
+            if (diff > 0 && currentSlide > 0) {
+                currentSlide--; // Свайп вправо
+            } else if (diff < 0 && currentSlide < 3) {
+                currentSlide++; // Свайп влево
+            }
+        }
+        
+        goToSlide(currentSlide);
+    }
+
+    slider.addEventListener('mouseup', handleEnd);
+    slider.addEventListener('mouseleave', handleEnd);
+    slider.addEventListener('touchend', handleEnd);
+
+    // Обработка клавиш
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
+        if (e.key === 'ArrowRight') goToSlide(currentSlide + 1);
+    });
+
+    // Начальная инициализация
+    goToSlide(0);
+}
+
+// Функция обновления языка интерфейса
+function updateLanguage(lang) {
+    const texts = translations[lang];
+    if (!texts) return;
+
+    // Обновляем все элементы с атрибутом data-translate
+    document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (texts[key]) {
+            element.textContent = texts[key];
+        }
+    });
+
+    // Обновляем все тексты в меню
+    const menuTexts = {
+        'start-button': texts.play,
+        'leaderboard-button': texts.leaderboard,
+        'settings-button': texts.settings,
+        'about-button': texts.about,
+        'back-to-menu': texts.back,
+        'resume-button': texts.resume,
+        'end-game-button': texts.endGame,
+        'easy-mode': texts.easy,
+        'medium-mode': texts.medium,
+        'hard-mode': texts.hard,
+        'pause-settings-button': texts.settings
+    };
+
+    // Обновляем тексты кнопок
+    for (const [id, text] of Object.entries(menuTexts)) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = text;
+        }
+    }
+
+    // Обновляем тексты в настройках
+    document.querySelectorAll('.settings-item span').forEach(span => {
+        const text = span.textContent.toLowerCase();
+        if (text === 'звук' || text === 'sound') {
+            span.textContent = texts.sound;
+        } else if (text === 'музыка' || text === 'music') {
+            span.textContent = texts.music;
+        } else if (text === 'язык' || text === 'language') {
+            span.textContent = texts.language;
+        } else if (text.includes('fps')) {
+            span.textContent = texts['show-fps'];
+        }
+    });
+
+    // Обновляем тексты "Вернуться в меню"
+    document.querySelectorAll('.back-text').forEach(element => {
+        element.textContent = texts.back;
+    });
+
+    // Обновляем заголовки экранов
+    const screenTitles = {
+        'settings-screen .swipe-text': texts.settings,
+        'about-screen .swipe-text': texts.about,
+        'leaderboard-screen .swipe-text': texts.leaderboard
+    };
+
+    for (const [selector, text] of Object.entries(screenTitles)) {
+        const element = document.querySelector(`#${selector}`);
+        if (element) {
+            element.textContent = text;
+        }
+    }
+
+    // Обновляем тексты в карточках главного меню
+    const menuCards = {
+        'play': {
+            title: texts.play,
+            description: texts.playDescription
+        },
+        'leaderboard': {
+            title: texts.leaderboard,
+            description: texts.leaderboardDescription
+        },
+        'settings': {
+            title: texts.settings,
+            description: texts.settingsDescription
+        },
+        'about': {
+            title: texts.about,
+            description: texts.aboutDescription
+        }
+    };
+
+    document.querySelectorAll('.menu-card').forEach((card, index) => {
+        const type = Object.keys(menuCards)[index];
+        const cardTexts = menuCards[type];
+        const titleEl = card.querySelector('h2');
+        const descEl = card.querySelector('p');
+        
+        if (titleEl && cardTexts.title) {
+            titleEl.textContent = cardTexts.title;
+        }
+        if (descEl && cardTexts.description) {
+            descEl.textContent = cardTexts.description;
+        }
+    });
+
+    // Обновляем тексты на экране выбора сложности
+    const difficultyScreen = document.querySelector('#difficulty-screen .swipe-text');
+    if (difficultyScreen) {
+        difficultyScreen.textContent = texts.difficulty_title;
+    }
+
+    // Обновляем карточки сложности
+    const difficultyCards = document.querySelectorAll('#difficulty-screen .about-card');
+    difficultyCards.forEach((card, index) => {
+        const h2 = card.querySelector('h2');
+        const p = card.querySelector('p');
+        const button = card.querySelector('.menu-button');
+
+        switch(index) {
+            case 0: // Легкий уровень
+                if (h2) h2.textContent = texts.easy_title;
+                if (p) p.textContent = texts.easy_description;
+                if (button) button.textContent = texts.start_game;
+                break;
+            case 1: // Средний уровень
+                if (h2) h2.textContent = texts.medium_title;
+                if (p) p.textContent = texts.medium_description;
+                if (button) button.textContent = texts.start_game;
+                break;
+            case 2: // Сложный уровень
+                if (h2) h2.textContent = texts.hard_title;
+                if (p) p.textContent = texts.hard_description;
+                if (button) button.textContent = texts.start_game;
+                break;
+        }
+    });
+
+    // Обновляем текст "Вернуться в меню" на экране сложности
+    const difficultyBackText = document.querySelector('#difficulty-screen .back-text');
+    if (difficultyBackText) {
+        difficultyBackText.textContent = texts.back;
+    }
+
+    // Сохраняем выбранный язык
+    if (game) {
+        game.settings.language = lang;
+        game.saveSettings();
+    }
+    localStorage.setItem('gameLanguage', lang);
 } 
