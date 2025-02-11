@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CryptoRush</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="desktop-message" class="hidden">
+        <h1>CryptoRush</h1>
+        <p>Эта игра доступна только на мобильных устройствах.</p>
+        <p>Пожалуйста, откройте игру на телефоне или планшете.</p>
+    </div>
+    
+    <div id="game-container" class="hidden">
+        <!-- Главное меню -->
+        <div id="main-menu" class="screen">
+            <div class="menu-container">
+                <div class="game-logo">
+                    <div class="logo-image">
+                        <div class="prostobas-coin">
+                            <div class="coin-inner">
+                                <div class="coin-front">
+                                    <span class="coin-symbol">CR</span>
+                                </div>
+                                <div class="coin-glow"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="logo-text">
+                        <span class="crypto">Crypto</span>
+                        <span class="rush">Rush</span>
+                    </div>
+                </div>
+                <div class="menu-buttons">
+                    <button id="start-button" class="menu-button">
+                        <i class="button-icon play-icon"></i>
+                        <span>Играть</span>
+                    </button>
+                    <div class="difficulty-select hidden">
+                        <button id="easy-mode" class="menu-button">
+                            <i class="button-icon easy-icon"></i>
+                            <span>Легкий</span>
+                        </button>
+                        <button id="medium-mode" class="menu-button">
+                            <i class="button-icon medium-icon"></i>
+                            <span>Средний</span>
+                        </button>
+                        <button id="hard-mode" class="menu-button">
+                            <i class="button-icon hard-icon"></i>
+                            <span>Сложный</span>
+                        </button>
+                        <button id="back-to-menu" class="menu-button">
+                            <i class="button-icon back-icon"></i>
+                            <span>Назад</span>
+                        </button>
+                    </div>
+                    <button id="leaderboard-button" class="menu-button">
+                        <i class="button-icon trophy-icon"></i>
+                        <span>Таблица рекордов</span>
+                    </button>
+                    <button id="settings-button" class="menu-button">
+                        <i class="button-icon settings-icon"></i>
+                        <span>Настройки</span>
+                    </button>
+                    <button id="about-button" class="menu-button">
+                        <i class="button-icon info-icon"></i>
+                        <span>Об игре</span>
+                    </button>
+                </div>
+                <div class="version-info">Версия 1.0.0</div>
+            </div>
+        </div>
+
+        <!-- Игровой экран -->
+        <div id="game-screen" class="screen hidden">
+            <canvas id="gameCanvas"></canvas>
+            <div id="score"><span data-translate="coins">Монеты</span>: <span id="coins">0</span></div>
+            <div id="lives">
+                <span data-translate="lives">Жизни</span>:
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+            </div>
+            <button id="pause-button">⏸</button>
+            
+            <!-- Добавляем меню паузы -->
+            <div id="pause-menu" class="screen hidden">
+                <div class="pause-content">
+                    <h2>Пауза</h2>
+                    <button id="resume-button" data-translate="resume">Продолжить</button>
+                    <button id="pause-settings-button">Настройки</button>
+                    <button id="end-game-button" data-translate="endGame">Закончить игру</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран настроек -->
+        <div id="settings-screen" class="screen hidden">
+            <div class="settings-header">
+                <h2 data-translate="settings">Настройки</h2>
+            </div>
+            <div class="settings-cards">
+                <div class="settings-card">
+                    <div class="card-icon">
+                        <i class="sound-icon"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-label" data-translate="sound">Звук</span>
+                        <div class="card-value">
+                            <input type="checkbox" id="sound" class="toggle-switch">
+                            <label for="sound" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="card-icon">
+                        <i class="music-icon"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-label" data-translate="music">Музыка</span>
+                        <div class="card-value">
+                            <input type="checkbox" id="music" class="toggle-switch">
+                            <label for="music" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <div class="card-icon">
+                        <i class="language-icon"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-label" data-translate="language">Язык</span>
+                        <div class="card-value">
+                            <select id="language" class="settings-select">
+                                <option value="ru">Русский</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="settings-back" class="back-button transparent" data-translate="back">Назад</button>
+        </div>
+
+        <!-- Экран "Об игре" -->
+        <div id="about-screen" class="screen hidden">
+            <div class="about-slider">
+                <div class="about-cards">
+                    <!-- Карточка 1 -->
+                    <div class="about-card">
+                        <div class="card-icon">
+                            <div class="icon-wrapper gradient-pink">
+                                <div class="hands-icon">
+                                    <span class="hand top"></span>
+                                    <span class="sparkles"></span>
+                                    <span class="hand bottom"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 data-translate="about_card1_title">Игровой процесс</h3>
+                        <p data-translate="about_card1_text">Увлекательный раннер с элементами криптовалютного мира</p>
+                    </div>
+
+                    <!-- Карточка 2 -->
+                    <div class="about-card">
+                        <div class="card-icon">
+                            <div class="icon-wrapper gradient-purple">
+                                <div class="fingerprint-icon"></div>
+                            </div>
+                        </div>
+                        <h3 data-translate="about_card2_title">Особенности</h3>
+                        <p data-translate="about_card2_text">Различные типы монет и уникальные препятствия</p>
+                    </div>
+
+                    <!-- Карточка 3 -->
+                    <div class="about-card">
+                        <div class="card-icon">
+                            <div class="icon-wrapper gradient-blue">
+                                <div class="waves-icon">
+                                    <span class="wave"></span>
+                                    <span class="wave"></span>
+                                    <span class="wave"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <h3 data-translate="about_card3_title">Награды</h3>
+                        <p data-translate="about_card3_text">Соревнуйтесь и попадайте в таблицу лидеров</p>
+                    </div>
+                </div>
+
+                <!-- Индикаторы слайдов -->
+                <div class="slider-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            <button id="about-back" class="back-button transparent" data-translate="back">Назад</button>
+        </div>
+
+        <!-- Добавляем экран таблицы рекордов -->
+        <div id="leaderboard-screen" class="screen hidden">
+            <div class="section-wrapper">
+                <h2 class="section-title">Лучшие результаты</h2>
+                <div class="section-container">
+                    <div id="leaderboard-list"></div>
+                </div>
+            </div>
+            <button id="leaderboard-back" class="back-button">Назад</button>
+        </div>
+    </div>
+    <script>
+        // Проверка мобильного устройства
+        function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") 
+                || (navigator.userAgent.indexOf('IEMobile') !== -1)
+                || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Показываем соответствующий контент при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isMobileDevice()) {
+                document.getElementById('game-container').classList.remove('hidden');
+            } else {
+                document.getElementById('desktop-message').classList.remove('hidden');
+            }
+        });
+    </script>
+    <script src="data.js"></script>
+    <script src="settings.js"></script>
+    <script src="game.js"></script>
+</body>
+</html> 
