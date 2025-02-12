@@ -9,8 +9,12 @@
 <body>
     <div id="desktop-message" class="hidden">
         <h1>CryptoRush</h1>
-        <p>Эта игра доступна только на мобильных устройствах.</p>
-        <p>Пожалуйста, откройте игру на телефоне или планшете.</p>
+        <div class="device-icons">
+            📱 📲 
+        </div>
+        <p>Эта игра доступна только на мобильных устройствах</p>
+        <p>Пожалуйста, откройте игру на смартфоне или планшете</p>
+        <p class="qr-hint">Отсканируйте QR-код или перейдите по ссылке на мобильном устройстве</p>
     </div>
     
     <div id="game-container" class="hidden">
@@ -18,6 +22,7 @@
         <div id="main-menu" class="screen">
             <div class="swipe-hint">
                 <span class="swipe-text">CryptoRush</span>
+                <span class="swipe-arrow">← листайте меню →</span>
             </div>
             <div class="about-slider">
                 <div class="about-cards">
@@ -100,11 +105,17 @@
             
             <!-- Добавляем меню паузы -->
             <div id="pause-menu" class="screen hidden">
-                <div class="pause-content">
-                    <h2>Пауза</h2>
-                    <button id="resume-button" data-translate="resume">Продолжить</button>
-                    <button id="pause-settings-button">Настройки</button>
-                    <button id="end-game-button" data-translate="endGame">Закончить игру</button>
+                <div class="pause-card">
+                    <div class="feature-block">
+                        <div class="block-icon">⏸️</div>
+                    </div>
+                    <div class="pause-content">
+                        <h2>Пауза</h2>
+                    </div>
+                    <div class="pause-buttons">
+                        <button class="pause-button" id="resume-button">Продолжить</button>
+                        <button class="pause-button end-game" id="end-game-button">Завершить игру</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -319,19 +330,33 @@
         </div>
     </div>
     <script>
-        // Проверка мобильного устройства
+        // Обновленная функция проверки мобильного устройства
         function isMobileDevice() {
-            return (typeof window.orientation !== "undefined") 
-                || (navigator.userAgent.indexOf('IEMobile') !== -1)
-                || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            // Проверяем сенсорные возможности
+            const hasTouchScreen = navigator.maxTouchPoints > 0 || 
+                (navigator.msMaxTouchPoints > 0) ||
+                ('ontouchstart' in window) ||
+                (window.DocumentTouch && document instanceof DocumentTouch);
+
+            // Проверяем User Agent на наличие мобильных устройств и планшетов
+            const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+            const isMobileUA = mobileRegex.test(navigator.userAgent);
+
+            // Проверяем ориентацию (доступна только на мобильных)
+            const hasOrientation = typeof window.orientation !== "undefined";
+
+            // Возвращаем true, если хотя бы один из признаков указывает на мобильное устройство
+            return hasTouchScreen || isMobileUA || hasOrientation;
         }
 
         // Показываем соответствующий контент при загрузке
         document.addEventListener('DOMContentLoaded', function() {
             if (isMobileDevice()) {
                 document.getElementById('game-container').classList.remove('hidden');
+                document.getElementById('desktop-message').classList.add('hidden');
             } else {
                 document.getElementById('desktop-message').classList.remove('hidden');
+                document.getElementById('game-container').classList.add('hidden');
             }
         });
     </script>

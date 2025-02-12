@@ -35,7 +35,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 20px;
-    background: linear-gradient(135deg, rgba(30, 30, 46, 0.9) 0%, rgba(44, 44, 84, 0.9) 100%);
+    background: #000;
     backdrop-filter: blur(10px);
 }
 
@@ -101,18 +101,141 @@ button:active {
     margin-left: 2px;
 }
 
+/* Обновляем стили для кнопки паузы */
 #pause-button {
     position: absolute;
     top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 14px;
-    padding: 5px 15px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+    right: 20px; /* Перемещаем в правый угол */
+    font-size: clamp(14px, 3vw, 16px);
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    border-radius: 8px;
     color: white;
     backdrop-filter: blur(5px);
+    z-index: 100;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#pause-button:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: translateY(-2px);
+}
+
+/* Стили для меню паузы */
+#pause-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #000;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Карточка меню паузы */
+.pause-card {
+    background: rgba(18, 18, 18, 0.8);
+    border-radius: 16px;
+    padding: 20px;
+    width: min(90vw, 320px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    backdrop-filter: blur(10px);
+}
+
+/* Градиентный блок в меню паузы */
+.pause-card .feature-block {
+    width: 100%;
+    height: 180px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #6C63FF, #00A8FF);
+}
+
+/* Иконка паузы */
+.pause-card .block-icon {
+    font-size: clamp(40px, 10vw, 80px);
+    color: white;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+}
+
+/* Контент меню паузы */
+.pause-content {
+    width: 100%;
+    text-align: center;
+}
+
+.pause-content h2 {
+    font-size: clamp(24px, 6vw, 32px);
+    margin-bottom: 20px;
+    color: white;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Кнопки в меню паузы */
+.pause-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.pause-button {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: clamp(14px, 4vw, 16px);
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6C63FF, #00A8FF);
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pause-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+}
+
+.pause-button.end-game {
+    background: linear-gradient(135deg, #FF4B4B, #FF7070);
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .pause-card {
+        width: 85vw;
+    }
+
+    .pause-card .feature-block {
+        height: 150px;
+    }
+}
+
+@media (max-width: 320px) {
+    .pause-card {
+        padding: 15px;
+    }
+
+    .pause-card .feature-block {
+        height: 120px;
+    }
+
+    .pause-button {
+        padding: 10px 16px;
+    }
 }
 
 .settings-option {
@@ -316,31 +439,68 @@ button:active {
     100% { box-shadow: 0 0 5px var(--primary-color); }
 }
 
+/* Стили для сообщения на десктопе */
 #desktop-message {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
+    background: #000;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #1a1a1a;
-    color: #fff;
     text-align: center;
     padding: 20px;
+    color: white;
+    z-index: 9999;
 }
 
 #desktop-message h1 {
-    color: #4CAF50;
-    margin-bottom: 20px;
+    font-size: clamp(32px, 5vw, 48px);
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #6C63FF, #00A8FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
 }
 
 #desktop-message p {
-    font-size: 18px;
+    font-size: clamp(16px, 2.5vw, 20px);
+    line-height: 1.6;
     margin: 10px 0;
+    color: rgba(255, 255, 255, 0.9);
     max-width: 600px;
+}
+
+#desktop-message .qr-hint {
+    margin-top: 40px;
+    font-size: clamp(14px, 2vw, 18px);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#desktop-message .device-icons {
+    font-size: clamp(40px, 6vw, 64px);
+    margin: 30px 0;
+    color: #6C63FF;
+}
+
+/* Адаптивность для разных экранов */
+@media (max-width: 480px) {
+    #desktop-message h1 {
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+
+    #desktop-message p {
+        font-size: 16px;
+    }
+
+    #desktop-message .device-icons {
+        font-size: 36px;
+        margin: 20px 0;
+    }
 }
 
 .about-content {
@@ -390,31 +550,6 @@ button:active {
     .about-content p {
         font-size: 18px;
     }
-}
-
-#pause-menu {
-    background: rgba(30, 30, 46, 0.95);
-    z-index: 100;
-}
-
-.pause-content {
-    background: rgba(45, 52, 54, 0.9);
-    padding: 30px;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-    backdrop-filter: blur(10px);
-}
-
-.pause-content h2 {
-    color: #4CAF50;
-    margin-bottom: 10px;
-}
-
-.pause-content button {
-    width: 200px;
 }
 
 /* Стили для версии */
@@ -572,9 +707,12 @@ button:active {
 }
 
 .feature-content {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
+    text-align: center;
+    align-items: center;
 }
 
 .feature-content h2 {
@@ -727,41 +865,46 @@ h1, h2 {
     overflow-y: hidden;
     display: flex;
     align-items: center;
-    padding-top: 80px;
-    padding-bottom: 80px;
+    padding: 80px 0;
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Стилизация скроллбара */
-.about-slider::-webkit-scrollbar {
-    display: none;
-}
-
+/* Стили для контейнера карточек */
 .about-cards {
     display: flex;
-    width: max-content;
-    padding: 0 calc(50% - 160px); /* Центрируем первую карточку (половина экрана минус половина ширины карточки) */
+    width: max-content; /* Важно для горизонтального скролла */
+    padding: 0 calc(50% - 160px);
     gap: 16px;
     height: auto;
     align-items: center;
 }
 
+/* Скрываем скроллбар, но оставляем функциональность */
+.about-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.about-slider {
+    -ms-overflow-style: none;  /* IE и Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Обновляем стили карточек */
 .about-card {
+    flex-shrink: 0;
     width: 320px;
-    min-width: 320px;
-    height: 460px;
-    background: rgba(18, 18, 18, 0.95);
+    height: calc(100vh - 160px);
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
     border-radius: 16px;
-    overflow: hidden;
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    box-sizing: border-box;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
 }
 
 .feature-image {
-    width: 90%;
+    width: 100%;
     height: 200px;
     overflow: hidden;
     margin-bottom: 20px;
@@ -775,40 +918,38 @@ h1, h2 {
 }
 
 .feature-content {
-    width: 100%;
-    padding: 0;
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    text-align: left;
+    gap: 10px;
+    text-align: center;
+    align-items: center;
 }
 
 .feature-content h2 {
+    font-size: min(28px, 5vw);
+    margin-bottom: 15px;
+    width: 100%;
+    text-align: center;
     color: #fff;
-    font-size: 28px;
-    margin: 0;
-    font-weight: 500;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    letter-spacing: -0.5px;
+    font-weight: 600;
+    line-height: 1.2;
 }
 
 .feature-content p {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 15px;
+    font-size: min(16px, 4vw);
     line-height: 1.5;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 15px;
 }
 
 /* Адаптивность для мобильных устройств */
 @media (max-width: 768px) {
     .about-card {
-        width: 280px;
-        min-width: 280px;
-        height: 420px;
-        padding: 16px;
+        width: 85vw;
+        min-height: 50vh;
     }
 
     .feature-image {
@@ -1216,12 +1357,11 @@ h1, h2 {
 }
 
 .menu-button {
-    width: 200px;
-    padding: 15px;
-    margin: 10px;
-    border: 2px solid white;
-    border-radius: 5px;
-    font-size: 18px;
+    width: min(90%, 300px);
+    padding: 12px 20px;
+    font-size: min(16px, 4vw);
+    margin-bottom: 10px;
+    border-radius: 8px;
     cursor: pointer;
     text-align: center;
     background: transparent;
@@ -1437,513 +1577,530 @@ button {
 /* Стили для подсказки свайпа */
 .swipe-hint {
     position: absolute;
-    left: 0;
-    right: 0;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 18px;
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 12px 24px;
-    backdrop-filter: blur(10px);
-    width: fit-content;
-    margin: 0 auto;
-    border-radius: 20px;
-}
-
-.swipe-hint:not(.bottom-hint) {
+    right: 20px;
     top: 20px;
-    font-size: 24px;
-    font-weight: 600;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.bottom-hint {
-    bottom: 20px;
-    font-size: 14px;
-}
-
-.swipe-text {
-    font-weight: 400;
-}
-
-.swipe-arrow {
-    font-size: 18px;
-    opacity: 0.8;
-}
-
-@keyframes arrowMove {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(10px); }
-}
-
-/* Стили для подсказки возврата */
-.back-hint {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 14px;
+    font-size: clamp(14px, 3vw, 24px);
+    padding: clamp(8px, 2vw, 16px) clamp(12px, 3vw, 24px);
     z-index: 10;
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-    user-select: none; /* Запрещаем выделение текста */
+    gap: 15px;
 }
 
-.back-hint:active {
-    opacity: 0.5; /* Эффект при нажатии */
+.back-hint {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    z-index: 100;
+    padding: clamp(6px, 1.5vw, 12px) clamp(10px, 2vw, 20px);
 }
 
 .back-arrow {
-    font-size: 18px;
-    animation: arrowMoveLeft 1.5s infinite;
+    font-size: clamp(14px, 2.5vw, 18px);
 }
 
 .back-text {
-    font-weight: 400;
+    font-size: clamp(12px, 2vw, 16px);
 }
 
-@keyframes arrowMoveLeft {
-    0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(-5px); }
-}
-
-/* Стили для заголовка раздела */
-.feature-header {
-    padding: 40px 20px;
-    text-align: left;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.feature-header h1 {
-    font-size: 48px;
-    font-weight: 600;
-    color: #fff;
-    margin-bottom: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    letter-spacing: -0.5px;
-}
-
-.feature-header p {
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 30px;
-    line-height: 1.5;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-.see-more-button {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Fira Code', monospace;
-}
-
-.see-more-button:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-/* Обновленные стили для карточек */
-.about-card {
-    background: rgba(18, 18, 18, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 30px;
-    height: auto;
-}
-
+/* Стили для контента */
 .feature-content {
-    text-align: left;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    align-items: center;
 }
 
 .feature-content h2 {
-    font-size: 32px;
-    color: #fff;
-    margin-bottom: 16px;
-    font-weight: 600;
+    font-size: clamp(16px, 4vw, 28px);
+    margin-bottom: min(10px, 1.5vh);
     line-height: 1.2;
 }
 
 .feature-content p {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1.6;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .feature-header h1 {
-        font-size: 36px;
-    }
-
-    .feature-header p {
-        font-size: 18px;
-    }
-
-    .feature-content h2 {
-        font-size: 24px;
-    }
-
-    .feature-content p {
-        font-size: 15px;
-    }
-}
-
-/* Стили для заголовков в настройках */
-.feature-title {
-    font-size: 48px;
-    font-weight: 600;
-    color: #fff;
-    margin: 40px 20px 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    letter-spacing: -0.5px;
-}
-
-.feature-subtitle {
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.7);
-    margin: 0 20px 40px;
-    line-height: 1.5;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-#fps-counter {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.5);
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    font-family: monospace;
-    z-index: 1000;
-}
-
-/* Стили для карточек меню */
-.menu-card {
-    height: 500px !important; /* Фиксированная высота для всех карточек */
-    min-height: unset;
-    display: flex;
-    flex-direction: column;
-}
-
-.menu-card .feature-image {
-    width: 100%;
-    height: 200px; /* Фиксированная высота для изображений */
-    margin-bottom: 20px;
-}
-
-.menu-card .feature-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-}
-
-.menu-card .feature-content h2 {
-    font-size: 28px;
-    margin-bottom: 10px;
-}
-
-.menu-card .feature-content p {
-    font-size: 16px;
-    margin-bottom: 20px;
-    flex-grow: 1; /* Текст будет занимать доступное пространство */
-}
-
-.menu-buttons {
-    margin-top: auto; /* Кнопки прижмутся к низу */
-    margin-bottom: 10px;
-}
-
-/* Стили для верхнего и нижнего заголовков */
-.swipe-hint {
-    position: absolute;
-    left: 0;
-    right: 0;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 18px;
-    z-index: 10;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 12px 24px;
-    backdrop-filter: blur(10px);
-    width: fit-content;
-    margin: 0 auto;
-    border-radius: 20px;
-}
-
-.swipe-hint:not(.bottom-hint) {
-    top: 20px;
-    font-size: 24px;
-    font-weight: 600;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.bottom-hint {
-    bottom: 20px;
-    font-size: 14px;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .menu-card {
-        height: 450px !important;
-    }
-
-    .menu-card .feature-image {
-        height: 160px;
-    }
-
-    .menu-card .feature-content h2 {
-        font-size: 24px;
-    }
-
-    .menu-card .feature-content p {
-        font-size: 14px;
-    }
-
-    .swipe-hint:not(.bottom-hint) {
-        font-size: 20px;
-    }
+    font-size: clamp(12px, 2.5vw, 16px);
+    line-height: 1.4;
+    margin-bottom: min(15px, 2vh);
 }
 
 /* Стили для градиентных блоков */
 .feature-block {
     width: 100%;
-    height: 200px;
+    height: 35%; /* Увеличиваем высоту для главного меню */
+    min-height: 180px; /* Минимальная высота тоже больше */
     border-radius: 12px;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.block-icon {
-    font-size: 48px;
-    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
 /* Градиенты для разных карточек */
 .gradient-play {
     background: linear-gradient(135deg, #6C63FF, #00A8FF);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
 }
 
 .gradient-leaderboard {
     background: linear-gradient(135deg, #FF6B6B, #FFE66D);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
 }
 
 .gradient-settings {
     background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
 }
 
 .gradient-about {
     background: linear-gradient(135deg, #9C27B0, #E91E63);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Анимация при наведении */
-.feature-block:hover {
-    transform: scale(1.02);
-    transition: transform 0.3s ease;
+/* Градиенты для уровней сложности */
+.gradient-easy {
+    background: linear-gradient(135deg, #4CAF50, #8BC34A);
 }
 
-.feature-block:hover .block-icon {
-    transform: scale(1.1);
-    transition: transform 0.3s ease;
+.gradient-medium {
+    background: linear-gradient(135deg, #FF9800, #FFC107);
 }
 
-/* Адаптивность */
-@media (max-width: 768px) {
+.gradient-hard {
+    background: linear-gradient(135deg, #F44336, #FF5252);
+}
+
+/* Градиенты для таблицы рекордов */
+.gradient-gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.gradient-silver {
+    background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+}
+
+.gradient-bronze {
+    background: linear-gradient(135deg, #CD7F32, #8B4513);
+}
+
+/* Стили для кнопок */
+.menu-buttons {
+    width: 100%;
+    margin-top: 10px; /* Фиксированный отступ от текста */
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-button {
+    width: min(90%, 300px);
+    padding: 12px 20px;
+    font-size: min(16px, 4vw);
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+
+/* Стили для иконок */
+.block-icon {
+    font-size: clamp(32px, 8vw, 64px); /* Увеличиваем размер иконок */
+    color: white;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+}
+
+/* Адаптивные отступы для слайдера */
+.about-slider {
+    padding: 10vh 5vw;
+}
+
+.about-cards {
+    gap: 3vw;
+    padding: 0 calc(50% - 45vw); /* Центрирование первой карточки */
+}
+
+/* Медиа-запросы для разных размеров экрана */
+@media (min-width: 768px) {
+    .about-card {
+        width: 80vw;
+        max-width: 450px;
+    }
+}
+
+@media (max-width: 767px) {
+    .about-card {
+        width: 85vw;
+        min-height: 50vh;
+    }
+
     .feature-block {
-        height: 160px;
-    }
-
-    .block-icon {
-        font-size: 36px;
+        height: 20vh;
     }
 }
 
-/* Стили для кнопок в карточках */
-.gradient-play .menu-buttons .menu-button {
+@media (max-width: 480px) {
+    .about-card {
+        width: 90vw;
+        min-height: 45vh;
+        padding: 2vh 4vw;
+    }
+
+    .feature-block {
+        height: 30%;
+        min-height: 150px;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 320px) {
+    .about-card {
+        width: 95vw;
+        min-height: 40vh;
+        padding: 2vh 3vw;
+    }
+
+    .feature-block {
+        height: 25%;
+        min-height: 120px;
+    }
+}
+
+/* Для очень высоких экранов */
+@media (min-height: 1000px) {
+    .about-card {
+        min-height: 40vh;
+    }
+
+    .feature-block {
+        height: 15vh;
+    }
+}
+
+/* Медиа-запросы для разных высот экрана */
+@media (max-height: 600px) {
+    .about-slider {
+        padding: 60px 0;
+    }
+    
+    .about-card {
+        height: calc(100vh - 120px);
+    }
+    
+    .feature-block {
+        min-height: 80px;
+    }
+}
+
+@media (max-height: 400px) {
+    .about-slider {
+        padding: 40px 0;
+    }
+    
+    .about-card {
+        height: calc(100vh - 80px);
+    }
+    
+    .feature-block {
+        min-height: 60px;
+    }
+}
+
+/* Специальные стили для блоков в главном меню */
+#main-menu .feature-block {
+    height: 45%; /* Увеличиваем высоту для главного меню */
+    min-height: 220px; /* Увеличиваем минимальную высоту */
+    margin-bottom: 25px; /* Увеличиваем отступ снизу */
+}
+
+/* Увеличиваем иконки в главном меню */
+#main-menu .block-icon {
+    font-size: clamp(40px, 10vw, 80px); /* Увеличиваем размер иконок */
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+}
+
+/* Адаптивность для разных экранов */
+@media (max-width: 480px) {
+    #main-menu .feature-block {
+        height: 40%;
+        min-height: 180px;
+    }
+}
+
+@media (max-width: 320px) {
+    #main-menu .feature-block {
+        height: 35%;
+        min-height: 150px;
+    }
+}
+
+/* Для очень высоких экранов */
+@media (min-height: 1000px) {
+    #main-menu .feature-block {
+        height: 40%;
+        min-height: 250px;
+    }
+}
+
+/* Стили для кнопок в карточках главного меню */
+#main-menu .about-card:nth-child(1) .menu-button {
     background: linear-gradient(135deg, #6C63FF, #00A8FF);
     border: none;
     box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
 }
 
-.gradient-leaderboard + .feature-content .menu-buttons .menu-button {
+#main-menu .about-card:nth-child(2) .menu-button {
     background: linear-gradient(135deg, #FF6B6B, #FFE66D);
     border: none;
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
-.gradient-settings + .feature-content .menu-buttons .menu-button {
+#main-menu .about-card:nth-child(3) .menu-button {
     background: linear-gradient(135deg, #4CAF50, #8BC34A);
     border: none;
     box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
-.gradient-about + .feature-content .menu-buttons .menu-button {
+#main-menu .about-card:nth-child(4) .menu-button {
     background: linear-gradient(135deg, #9C27B0, #E91E63);
     border: none;
     box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
 }
 
 /* Эффекты при наведении */
-.gradient-play .menu-buttons .menu-button:hover {
+#main-menu .about-card:nth-child(1) .menu-button:hover {
     background: linear-gradient(135deg, #7b73ff, #1fb2ff);
+    transform: translateY(-2px);
 }
 
-.gradient-leaderboard + .feature-content .menu-buttons .menu-button:hover {
+#main-menu .about-card:nth-child(2) .menu-button:hover {
     background: linear-gradient(135deg, #ff7b7b, #fff07d);
+    transform: translateY(-2px);
 }
 
-.gradient-settings + .feature-content .menu-buttons .menu-button:hover {
+#main-menu .about-card:nth-child(3) .menu-button:hover {
     background: linear-gradient(135deg, #5dbf60, #9bd35a);
+    transform: translateY(-2px);
 }
 
-.gradient-about + .feature-content .menu-buttons .menu-button:hover {
+#main-menu .about-card:nth-child(4) .menu-button:hover {
     background: linear-gradient(135deg, #ac37c0, #f92e73);
+    transform: translateY(-2px);
 }
 
-/* Общие стили для кнопок */
-.menu-buttons .menu-button {
-    width: 100%;
-    padding: 12px;
+/* Общие стили для кнопок в меню */
+#main-menu .menu-button {
+    width: min(90%, 300px);
+    padding: 12px 20px;
+    font-size: min(16px, 4vw);
+    margin-bottom: 10px;
     border-radius: 8px;
-    font-size: 16px;
+    color: white;
     font-weight: 500;
-    color: #fff;
-    cursor: pointer;
+    letter-spacing: 1px;
     transition: all 0.3s ease;
-    text-align: center;
 }
 
-/* Стили для кнопок выбора сложности */
-.difficulty-select .menu-button {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    margin-bottom: 8px;
+/* Специальные стили для текста в главном меню */
+#main-menu .feature-content h2 {
+    font-size: clamp(28px, 6vw, 36px); /* Увеличиваем размер заголовков */
+    margin-bottom: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.difficulty-select .menu-button:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
-    transform: translateY(-2px);
+#main-menu .feature-content p {
+    font-size: clamp(16px, 3vw, 18px); /* Немного увеличиваем описание */
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
 }
 
-/* Градиенты для уровней сложности */
-.gradient-easy {
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+/* Адаптивность для маленьких экранов */
+@media (max-width: 480px) {
+    #main-menu .feature-content h2 {
+        font-size: clamp(24px, 5vw, 32px);
+        margin-bottom: 15px;
+    }
+
+    #main-menu .feature-content p {
+        font-size: clamp(14px, 2.5vw, 16px);
+    }
 }
 
-.gradient-medium {
-    background: linear-gradient(135deg, #FF9800, #FFC107);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+@media (max-width: 320px) {
+    #main-menu .feature-content h2 {
+        font-size: clamp(22px, 4.5vw, 28px);
+        margin-bottom: 12px;
+    }
 }
 
-.gradient-hard {
-    background: linear-gradient(135deg, #F44336, #FF5252);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+/* Обновляем медиа-запросы для сверхмаленьких экранов */
+@media (max-width: 240px) {
+    /* Карточки */
+    .about-card {
+        width: 98vw;
+        min-height: 35vh;
+        padding: 10px;
+    }
+
+    /* Градиентные блоки */
+    #main-menu .feature-block {
+        height: 30%;
+        min-height: 100px;
+        margin-bottom: 15px;
+    }
+
+    /* Заголовки */
+    #main-menu .feature-content h2 {
+        font-size: clamp(18px, 4vw, 22px);
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Описание */
+    #main-menu .feature-content p {
+        font-size: clamp(12px, 2.5vw, 14px);
+        line-height: 1.3;
+        margin-bottom: 8px;
+    }
+
+    /* Кнопки */
+    #main-menu .menu-button {
+        width: 95%;
+        padding: 8px 12px;
+        font-size: clamp(12px, 3vw, 14px);
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Иконки */
+    #main-menu .block-icon {
+        font-size: clamp(32px, 8vw, 48px);
+    }
+
+    /* Верхние элементы */
+    .swipe-hint {
+        font-size: clamp(12px, 2.5vw, 14px);
+        padding: 6px 10px;
+    }
+
+    .back-hint {
+        padding: 4px 8px;
+    }
+
+    .back-text {
+        font-size: clamp(10px, 2vw, 12px);
+    }
+
+    .back-arrow {
+        font-size: clamp(12px, 2.5vw, 14px);
+    }
 }
 
-/* Стили для кнопок в карточках сложности */
-#easy-mode {
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    border: none;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+/* Адаптация для очень низких экранов */
+@media (max-height: 420px) {
+    .about-slider {
+        padding: 30px 0;
+    }
+
+    .about-card {
+        height: calc(100vh - 60px);
+    }
+
+    #main-menu .feature-block {
+        height: 35%;
+        min-height: 80px;
+    }
+
+    .feature-content {
+        gap: 8px;
+    }
+
+    #main-menu .feature-content h2 {
+        font-size: clamp(16px, 4vw, 20px);
+        margin-bottom: 4px;
+    }
+
+    #main-menu .feature-content p {
+        font-size: clamp(11px, 2.5vw, 13px);
+        margin-bottom: 4px;
+    }
+
+    .menu-buttons {
+        padding: 10px 0 0 0;
+    }
+
+    #main-menu .menu-button {
+        padding: 6px 10px;
+        margin-bottom: 6px;
+    }
 }
 
-#medium-mode {
-    background: linear-gradient(135deg, #FF9800, #FFC107);
-    border: none;
-    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+/* Комбинированный медиа-запрос для самых маленьких размеров */
+@media (max-width: 240px) and (max-height: 420px) {
+    .about-card {
+        padding: 8px;
+    }
+
+    #main-menu .feature-block {
+        height: 30%;
+        min-height: 70px;
+        margin-bottom: 10px;
+    }
+
+    #main-menu .feature-content h2 {
+        font-size: clamp(14px, 3.5vw, 18px);
+        margin-bottom: 4px;
+    }
+
+    #main-menu .feature-content p {
+        font-size: clamp(10px, 2.5vw, 12px);
+        line-height: 1.2;
+    }
+
+    #main-menu .menu-button {
+        padding: 5px 8px;
+        font-size: clamp(10px, 2.5vw, 12px);
+    }
+
+    #main-menu .block-icon {
+        font-size: clamp(24px, 6vw, 32px);
+    }
 }
 
-#hard-mode {
-    background: linear-gradient(135deg, #F44336, #FF5252);
-    border: none;
-    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+/* Медиа-запросы для маленьких экранов */
+@media (max-height: 480px) {
+    .menu-buttons {
+        margin-top: 8px;
+    }
 }
 
-/* Эффекты при наведении */
-#easy-mode:hover {
-    background: linear-gradient(135deg, #5dbf60, #9bd35a);
-    transform: translateY(-2px);
+@media (max-height: 320px) {
+    .menu-buttons {
+        margin-top: 6px;
+    }
 }
 
-#medium-mode:hover {
-    background: linear-gradient(135deg, #ffa726, #ffd54f);
-    transform: translateY(-2px);
+/* Для самых маленьких экранов */
+@media (max-width: 240px) and (max-height: 420px) {
+    .menu-buttons {
+        margin-top: 5px;
+    }
 }
 
-#hard-mode:hover {
-    background: linear-gradient(135deg, #ff5252, #ff8a80);
-    transform: translateY(-2px);
+/* Стили для заголовка и подсказки */
+.swipe-hint {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-/* Градиенты для карточек лидеров */
-.gradient-gold {
-    background: linear-gradient(135deg, #FFD700, #FFA500);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+.swipe-arrow {
+    font-size: clamp(14px, 2.5vw, 16px);
+    color: rgba(255, 255, 255, 0.7);
+    animation: fadeInOut 2s infinite;
 }
 
-.gradient-silver {
-    background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
-}
-
-.gradient-bronze {
-    background: linear-gradient(135deg, #CD7F32, #8B4513);
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
-}
-
-.leaderboard-info {
-    text-align: center;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    margin-top: 10px;
-}
-
-.leaderboard-info p {
-    margin: 5px 0;
-    font-size: 16px;
-}
-
-.leaderboard-info p:nth-child(2) {
-    font-size: 24px;
-    font-weight: bold;
-    color: #FFD700;
+@keyframes fadeInOut {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
 } 

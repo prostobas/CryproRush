@@ -118,7 +118,9 @@ class Game {
                 color: '#ffd93d',
                 speed: 0.7,
                 damage: 1,
-                shootInterval: 2000
+                shootInterval: 2000,
+                projectileSpeed: 5,
+                lastShot: 0
             }
         };
 
@@ -126,6 +128,15 @@ class Game {
 
         // Инициализируем звуки
         this.soundManager = new SoundManager();
+
+        // Добавляем обработчики для кнопок меню паузы
+        document.getElementById('resume-button').addEventListener('click', () => {
+            this.resumeGame();
+        });
+
+        document.getElementById('end-game-button').addEventListener('click', () => {
+            this.endGame();
+        });
     }
 
     init() {
@@ -259,6 +270,32 @@ class Game {
                 this.cryptoCoins.splice(index, 1);
             }
         });
+
+        // Обновляем снаряды
+        this.projectiles = this.projectiles.filter(projectile => {
+            projectile.x -= projectile.speed;
+            
+            // Проверяем столкновение с игроком
+            if (this.checkCollision(projectile, this.player)) {
+                this.takeDamage();
+                return false;
+            }
+            
+            return projectile.x > 0;
+        });
+
+        // Обрабатываем стрельбу врагов
+        this.obstacles.forEach(enemy => {
+            if (enemy.type === 'shooting') {
+                const currentTime = Date.now();
+                if (!enemy.lastShot) enemy.lastShot = currentTime;
+                
+                if (currentTime - enemy.lastShot >= this.enemyTypes.shooting.shootInterval) {
+                    this.createProjectile(enemy);
+                    enemy.lastShot = currentTime;
+                }
+            }
+        });
     }
 
     draw() {
@@ -349,11 +386,19 @@ class Game {
         }
 
         // Отрисовка снарядов
+        this.ctx.fillStyle = '#ff4757';
         this.projectiles.forEach(projectile => {
             this.ctx.beginPath();
-            this.ctx.fillStyle = projectile.color;
-            this.ctx.arc(projectile.x, projectile.y, projectile.radius, 0, Math.PI * 2);
+            this.ctx.arc(projectile.x, projectile.y, 5, 0, Math.PI * 2);
             this.ctx.fill();
+            
+            // Добавляем след от снаряда
+            this.ctx.beginPath();
+            this.ctx.strokeStyle = 'rgba(255, 71, 87, 0.5)';
+            this.ctx.lineWidth = 2;
+            this.ctx.moveTo(projectile.x, projectile.y);
+            this.ctx.lineTo(projectile.x + 10, projectile.y);
+            this.ctx.stroke();
         });
     }
 
@@ -443,26 +488,7 @@ class Game {
     }
 
     updateLeaderboard() {
-        const scores = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-        const difficultyTranslations = {
-            easy: translations[currentLanguage].easy,
-            medium: translations[currentLanguage].medium,
-            hard: translations[currentLanguage].hard
-        };
-
-        // Обновляем каждую позицию
-        for (let i = 1; i <= 3; i++) {
-            const score = scores[i - 1] || { name: '-', coins: 0, difficulty: '-' };
-            const nameEl = document.getElementById(`top${i}-name`);
-            const scoreEl = document.getElementById(`top${i}-score`);
-            const difficultyEl = document.getElementById(`top${i}-difficulty`);
-
-            if (nameEl) nameEl.textContent = score.name;
-            if (scoreEl) scoreEl.textContent = `${score.coins} ${translations[currentLanguage].coins}`;
-            if (difficultyEl) {
-                difficultyEl.textContent = difficultyTranslations[score.difficulty] || score.difficulty;
-            }
-        }
+        leaderboardData.updateLeaderboardDisplay();
     }
 
     loadSprite(src) {
@@ -516,15 +542,12 @@ class Game {
     }
 
     togglePause() {
-        this.isPaused = !this.isPaused;
-        this.isPlaying = !this.isPaused;
-        
-        const pauseMenu = document.getElementById('pause-menu');
-        if (this.isPaused) {
-            pauseMenu.classList.remove('hidden');
-        } else {
-            pauseMenu.classList.add('hidden');
-            this.gameLoop();
+        if (this.isPlaying) {
+            if (this.isPaused) {
+                this.resumeGame();
+            } else {
+                this.pauseGame();
+            }
         }
     }
 
@@ -532,7 +555,21 @@ class Game {
         this.isPlaying = false;
         this.isPaused = false;
         document.getElementById('pause-menu').classList.add('hidden');
-        showScreen('main-menu');
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+        // Останавливаем музыку
+        if (this.soundManager) {
+            this.soundManager.stopMusic();
+        }
+        // Сбрасываем состояние игры
+        this.resetGame();
+
+        // Проверяем, является ли результат рекордом
+        if (leaderboardData.isHighScore(this.coins)) {
+            const position = leaderboardData.addRecord(this.coins);
+            // Можно добавить уведомление о новом рекорде
+            alert(`Поздравляем! Вы заняли ${position} место в таблице рекордов!`);
+        }
     }
 
     updateLives() {
@@ -690,7 +727,7 @@ class Game {
             ...enemyConfig,
             type,
             initialY: 0,
-            lastShot: 0
+            lastShot: Date.now()
         };
 
         enemy.initialY = enemy.y;
@@ -713,6 +750,58 @@ class Game {
             this.fpsCounter.style.display = 'block';
         } else {
             this.fpsCounter.style.display = 'none';
+        }
+    }
+
+    // Обновляем метод паузы
+    pauseGame() {
+        if (this.isPlaying) {
+            this.isPaused = true;
+            document.getElementById('pause-menu').classList.remove('hidden');
+            // Останавливаем музыку если она играет
+            if (this.soundManager) {
+                this.soundManager.stopMusic();
+            }
+        }
+    }
+
+    // Добавляем метод возобновления игры
+    resumeGame() {
+        if (this.isPlaying) {
+            this.isPaused = false;
+            document.getElementById('pause-menu').classList.add('hidden');
+            // Возобновляем музыку если она была включена
+            if (this.soundManager && this.soundManager.musicEnabled) {
+                this.soundManager.startMusic();
+            }
+        }
+    }
+
+    // Метод для сброса состояния игры
+    resetGame() {
+        this.coins = 0;
+        this.obstacles = [];
+        this.cryptoCoins = [];
+        this.projectiles = []; // Очищаем снаряды
+        this.player.y = this.canvas.height / 2;
+        this.player.velocity = 0;
+        document.getElementById('coins').textContent = '0';
+        this.resetLives();
+    }
+
+    // Добавляем метод создания снаряда
+    createProjectile(enemy) {
+        const projectile = {
+            x: enemy.x,
+            y: enemy.y + enemy.height / 2,
+            speed: this.enemyTypes.shooting.projectileSpeed,
+            damage: this.enemyTypes.shooting.damage
+        };
+        this.projectiles.push(projectile);
+        
+        // Добавляем звуковой эффект выстрела
+        if (this.soundManager) {
+            this.soundManager.playSound('hit');
         }
     }
 }
@@ -810,11 +899,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('pause-button').addEventListener('click', () => {
-        game.togglePause();
+        if (game) {
+            game.togglePause();
+        }
     });
 
     document.getElementById('resume-button').addEventListener('click', () => {
-        game.togglePause();
+        if (game) {
+            game.resumeGame();
+        }
     });
 
     document.getElementById('pause-settings-button').addEventListener('click', () => {
